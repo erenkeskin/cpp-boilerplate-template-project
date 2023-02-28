@@ -1,0 +1,15 @@
+version: '3'
+services:
+    builder:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        command: /bin/bash -c "conan install .. --build=missing --output-folder=. && cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=on && cmake --build ."
+    tester:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        command: /bin/bash -c "./bin/template_test"
+        depends_on:
+            builder:
+                condition: service_completed_successfully
